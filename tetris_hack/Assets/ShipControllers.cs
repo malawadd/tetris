@@ -16,9 +16,27 @@ public class ShipController : MonoBehaviour
     private Vector2 lookInput, mouseDistance;
     private Vector2 screenCenter;
 
+    public GameObject[] tetrisPiecePrefabs;
+    private GameObject activePiece;
+
+
+
     // Start is called before the first frame update
     void Start()
     {
+        // 1. Spawn a random Tetris piece as a child of this GameObject (the 'ship')
+        if (tetrisPiecePrefabs != null && tetrisPiecePrefabs.Length > 0)
+        {
+            int randomIndex = Random.Range(0, tetrisPiecePrefabs.Length);
+            activePiece = Instantiate(
+                tetrisPiecePrefabs[randomIndex],
+                transform.position,
+                transform.rotation,
+                transform // parent it under the ship so it moves/rotates together
+            );
+        }
+
+        // 2. The rest of your existing initialization
         screenCenter = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
     }
 
