@@ -4,21 +4,13 @@ public class ShipCollisionHandler : MonoBehaviour
 {
     public GameObject explosionEffect; // Assign FX_Explosion prefab in the Inspector
     public float explosionDelay = 1.5f; // Time to show explosion before ending the game
+    public GameOverManager gameOverManager; // Reference to the GameOverManager
 
-    private bool isGameOver = false; // Prevent multiple triggers
+    private bool isGameOver = false;
 
     void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Asteroid") && !isGameOver)
-        {
-            isGameOver = true;
-            TriggerExplosion();
-        }
-    }
-
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Asteroid") && !isGameOver)
         {
             isGameOver = true;
             TriggerExplosion();
@@ -30,28 +22,32 @@ public class ShipCollisionHandler : MonoBehaviour
         // Instantiate the explosion effect
         Instantiate(explosionEffect, transform.position, transform.rotation);
 
-        // Hide the ship by disabling all renderers in its hierarchy
+        // Hide the ship (disable mesh renderer or set inactive)
         Renderer[] renderers = GetComponentsInChildren<Renderer>();
         foreach (Renderer renderer in renderers)
         {
             renderer.enabled = false;
         }
 
-        // Disable the ship's collider to prevent further collisions
         Collider collider = GetComponent<Collider>();
         if (collider != null)
         {
             collider.enabled = false;
         }
 
-        // Destroy the ship after the explosion delay
+        // Delay ending the game
         Invoke("EndGame", explosionDelay);
     }
 
     private void EndGame()
     {
-        // Destroy the ship and handle game-over logic
+        // Trigger the Game Over screen
+        if (gameOverManager != null)
+        {
+            gameOverManager.GameOver();
+        }
+
+        // Destroy the ship
         Destroy(gameObject);
-        Debug.Log("Game Over!");
     }
 }
